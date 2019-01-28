@@ -1,8 +1,9 @@
 #include <assert.h>
 #include <vector>
 
-#include "../loguru/loguru.hpp"
-#include "../raylib/src/raylib.h"
+#include <loguru.hpp>
+
+#include <raylib.h>
 
 #include "constants.hpp"
 #include "drawfunctions.hpp"
@@ -15,6 +16,7 @@ int main(int argc, char **argv) {
   loguru::init(argc, argv);
 
   auto world = InitWorld();
+
 
   ReadMap(&world, std::string(argv[1]));
 
@@ -117,7 +119,6 @@ int main(int argc, char **argv) {
         DrawTileOutline(i, world.map.mapwidth, WHITE);
       }
     }
-
     EndDrawing();
     //----------------------------------------------------------------------------------
   }

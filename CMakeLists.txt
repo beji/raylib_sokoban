@@ -12,5 +12,10 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 add_subdirectory(raylib)
 
-add_executable(raylibtest src/main.cpp src/map.cpp src/drawfunctions.cpp loguru/loguru.cpp)
-target_link_libraries(raylibtest raylib)
+add_library(loguru loguru/loguru.cpp)
+
+add_executable(raylibtest src/main.cpp src/map.cpp src/drawfunctions.cpp)
+
+target_include_directories(raylibtest PRIVATE loguru)
+
+target_link_libraries(raylibtest raylib loguru)
