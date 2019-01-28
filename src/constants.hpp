@@ -1,0 +1,15 @@
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
+
+#define SCREENWIDTH 800
+#define SCREENHIGHT 450
+
+#define RENDEROFFSETY 20
+#define RENDEROFFSETX 20
+
+#define TILESIZE 32
+
+#define MSPERTICK 0.2
+#define DOUBLETAPDELAY 0.2
+
+#endif /* CONSTANTS_H */
