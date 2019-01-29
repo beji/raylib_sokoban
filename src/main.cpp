@@ -11,12 +11,10 @@
 
 int main(int argc, char **argv) {
 
-  assert(argc == 2); // TODO: Proper error handling
-
   loguru::init(argc, argv);
+  CHECK_F(argc == 2, "You need to pass a mapfile to the application!");
 
   auto world = InitWorld();
-
 
   ReadMap(&world, std::string(argv[1]));
 
@@ -63,6 +61,8 @@ int main(int argc, char **argv) {
     }
 
     auto frametime = GetFrameTime();
+
+    LOG_IF_F(WARNING, frametime > 0.018, "Frametime seems to be getting high!");
 
     if (doubleTapDelay == 0) {
       doubleTapDelay = DOUBLETAPDELAY;
