@@ -52,6 +52,10 @@ int main(int argc, char **argv) {
       DLOG_F(INFO, "Input: reset");
       ResetMap(&world);
     }
+    if (IsKeyPressed(KEY_U)) {
+      DLOG_F(INFO, "Input: undo");
+      undo(&world);
+    }
 
     UpdatePlayerPosition(&world);
 
@@ -61,21 +65,22 @@ int main(int argc, char **argv) {
 
     ClearBackground(BLACK);
 
-    for (std::vector<char>::size_type i = 0; i != world.map.map.size(); i++) {
-      switch (world.map.map[i]) {
+    auto currentmap = world.historyCurrent->map;
+    for (std::vector<char>::size_type i = 0; i != currentmap.size(); i++) {
+      switch (currentmap[i]) {
       case 'X':
-        DrawWall(i, world.map.mapwidth, RED);
+        DrawWall(i, world.mapwidth, RED);
         break;
       case 'b':
-        DrawTileOutline(i, world.map.mapwidth, RAYWHITE);
-        DrawBox(i, world.map.mapwidth, BLUE);
+        DrawTileOutline(i, world.mapwidth, RAYWHITE);
+        DrawBox(i, world.mapwidth, BLUE);
         break;
       case '@':
-        DrawTileOutline(i, world.map.mapwidth, RAYWHITE);
-        DrawPlayer(i, world.map.mapwidth, SKYBLUE);
+        DrawTileOutline(i, world.mapwidth, RAYWHITE);
+        DrawPlayer(i, world.mapwidth, SKYBLUE);
         break;
       default:
-        DrawTileOutline(i, world.map.mapwidth, RAYWHITE);
+        DrawTileOutline(i, world.mapwidth, RAYWHITE);
       }
     }
 
@@ -92,6 +97,6 @@ int main(int argc, char **argv) {
   //--------------------------------------------------------------------------------------
   CloseWindow(); // Close window and OpenGL context
   //--------------------------------------------------------------------------------------
-
+  delete world.historyHead; // This will free all further entries of the history
   return 0;
 }
