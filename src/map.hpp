@@ -16,18 +16,10 @@ using position = struct _POSITION {
   int y;
 };
 
-using inputBuffer = struct _INBUFF {
-  bool left;
-  bool right;
-  bool up;
-  bool down;
-  bool reset;
-};
-
 using world = struct _WORLD {
   mapdef map;
   position playerPosition;
-  inputBuffer inputBuffer;
+  int turns;
 };
 
 int GetGridYPosition(const int i, const int mapwidth);
@@ -41,8 +33,6 @@ void TryMovePlayerRight(world *world);
 void TryMovePlayerLeft(world *world);
 void TryMovePlayerUp(world *world);
 void TryMovePlayerDown(world *world);
-
-void ResetInputBuffer(world *world);
 
 void ResetMap(world *world);
 

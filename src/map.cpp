@@ -66,9 +66,9 @@ void ReadMap(world *world, const std::string file) {
   } else {
     LOG_F(ERROR, "Failed to open file %s", file.c_str());
   }
-
   CHECK_F(playerFound, "Didn't find a player on the map");
   CHECK_F(boxCount > 0, "Didn't find a single box on the map");
+  UpdatePlayerPosition(world);
 }
 
 void UpdatePlayerPosition(world *world) {
@@ -111,6 +111,7 @@ void MoveBlockAndPlayerOnMap(world *world, const size_t playerIndex,
       world->map.map[blockTargetIndex] = 'b';
       world->map.map[targetIndex] = '@';
       RestoreTileFromOriginal(world, playerIndex);
+      world->turns++;
     }
   } else if (playerIndex == targetIndex + 1) {
     size_t blockTargetIndex = targetIndex - 1;
@@ -118,6 +119,7 @@ void MoveBlockAndPlayerOnMap(world *world, const size_t playerIndex,
       world->map.map[blockTargetIndex] = 'b';
       world->map.map[targetIndex] = '@';
       RestoreTileFromOriginal(world, playerIndex);
+      world->turns++;
     }
   } else if (playerIndex < targetIndex) {
     size_t blockTargetIndex = targetIndex + world->map.mapwidth;
@@ -125,6 +127,7 @@ void MoveBlockAndPlayerOnMap(world *world, const size_t playerIndex,
       world->map.map[blockTargetIndex] = 'b';
       world->map.map[targetIndex] = '@';
       RestoreTileFromOriginal(world, playerIndex);
+      world->turns++;
     }
   } else if (playerIndex > targetIndex) {
     size_t blockTargetIndex = targetIndex - world->map.mapwidth;
@@ -132,6 +135,7 @@ void MoveBlockAndPlayerOnMap(world *world, const size_t playerIndex,
       world->map.map[blockTargetIndex] = 'b';
       world->map.map[targetIndex] = '@';
       RestoreTileFromOriginal(world, playerIndex);
+      world->turns++;
     }
   }
 }
@@ -143,6 +147,7 @@ void MovePlayerOnMap(world *world, const size_t playerIndex,
   case '.': // Target space is empty
     RestoreTileFromOriginal(world, playerIndex);
     world->map.map[targetIndex] = '@';
+    world->turns++;
     break;
   case 'b': // Target space is a moveable block
     MoveBlockAndPlayerOnMap(world, playerIndex, targetIndex);
@@ -178,6 +183,7 @@ void TryMovePlayerLeft(world *world) {
 
 void TryMovePlayerUp(world *world) {
   ASSERT_SANE_WORLD;
+
   // Player is already at the top edge of the map
   if (world->playerPosition.y == 0) {
     return;
@@ -206,23 +212,16 @@ void TryMovePlayerDown(world *world) {
   MovePlayerOnMap(world, playerIndex, targetIndex);
 }
 
-void ResetInputBuffer(world *world) {
-  world->inputBuffer.down = false;
-  world->inputBuffer.left = false;
-  world->inputBuffer.right = false;
-  world->inputBuffer.up = false;
-  world->inputBuffer.reset = false;
-}
-
 void ResetMap(world *world) {
   ASSERT_SANE_WORLD;
   CHECK_F(world->map.originalmap.size() > 0,
           "The original map seems to be empty");
   world->map.map = world->map.originalmap;
+  world->turns = 0;
 }
 
 world InitWorld() {
   world world;
-  ResetInputBuffer(&world);
+  world.turns = 0;
   return world;
 }

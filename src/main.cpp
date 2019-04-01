@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <vector>
+#include <stdio.h>
 
 #include <loguru.hpp>
 
@@ -20,10 +21,7 @@ int main(int argc, char **argv) {
 
   // Initialization
   //--------------------------------------------------------------------------------------
-  int screenWidth = 800;
-  int screenHeight = 450;
-  float doubleTapDelay = 0;
-  InitWindow(screenWidth, screenHeight, "raylib sokoban thingy");
+  InitWindow(SCREENWIDTH, SCREENHEIGHT, "raylib sokoban thingy");
 
   SetTargetFPS(60);
 
@@ -34,68 +32,28 @@ int main(int argc, char **argv) {
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
 
-    // TODO: The whole input buffer system is crap
-
-    /* Get Input and store in buffer
-       This will hopefully allow handling of input done between ticks
-     */
-    if (IsKeyDown(KEY_RIGHT)) {
-      ResetInputBuffer(&world);
-      world.inputBuffer.right = true;
+    if (IsKeyPressed(KEY_RIGHT)) {
+      DLOG_F(INFO, "Input: right");
+      TryMovePlayerRight(&world);
     }
-    if (IsKeyDown(KEY_LEFT)) {
-      ResetInputBuffer(&world);
-      world.inputBuffer.left = true;
+    if (IsKeyPressed(KEY_LEFT)) {
+      DLOG_F(INFO, "Input: left");
+      TryMovePlayerLeft(&world);
     }
-    if (IsKeyDown(KEY_UP)) {
-      ResetInputBuffer(&world);
-      world.inputBuffer.up = true;
+    if (IsKeyPressed(KEY_UP)) {
+      DLOG_F(INFO, "Input: up");
+      TryMovePlayerUp(&world);
     }
-    if (IsKeyDown(KEY_DOWN)) {
-      ResetInputBuffer(&world);
-      world.inputBuffer.down = true;
+    if (IsKeyPressed(KEY_DOWN)) {
+      DLOG_F(INFO, "Input: down");
+      TryMovePlayerDown(&world);
     }
-    if (IsKeyDown(KEY_R)) {
-      ResetInputBuffer(&world);
-      world.inputBuffer.reset = true;
+    if (IsKeyPressed(KEY_R)) {
+      DLOG_F(INFO, "Input: reset");
+      ResetMap(&world);
     }
 
-    auto frametime = GetFrameTime();
-
-    LOG_IF_F(WARNING, frametime > 0.018, "Frametime seems to be getting high!");
-
-    if (doubleTapDelay == 0) {
-      doubleTapDelay = DOUBLETAPDELAY;
-
-      // Get buffered input and move player
-      if (world.inputBuffer.right) {
-        DLOG_F(INFO, "Input: right");
-        TryMovePlayerRight(&world);
-      }
-      if (world.inputBuffer.left) {
-        DLOG_F(INFO, "Input: left");
-        TryMovePlayerLeft(&world);
-      }
-      if (world.inputBuffer.up) {
-        DLOG_F(INFO, "Input: up");
-        TryMovePlayerUp(&world);
-      }
-      if (world.inputBuffer.down) {
-        DLOG_F(INFO, "Input: down");
-        TryMovePlayerDown(&world);
-      }
-      if (world.inputBuffer.reset) {
-        DLOG_F(INFO, "Input: reset");
-        ResetMap(&world);
-      }
-      ResetInputBuffer(&world);
-      // Update the player position struct
-      UpdatePlayerPosition(&world);
-    } else if (doubleTapDelay > 0) {
-      doubleTapDelay = doubleTapDelay - frametime;
-    } else { // doubleTapDelay < 0
-      doubleTapDelay = 0;
-    }
+    UpdatePlayerPosition(&world);
 
     // Draw
     //----------------------------------------------------------------------------------
@@ -109,16 +67,23 @@ int main(int argc, char **argv) {
         DrawWall(i, world.map.mapwidth, RED);
         break;
       case 'b':
-        DrawTileOutline(i, world.map.mapwidth, WHITE);
+        DrawTileOutline(i, world.map.mapwidth, RAYWHITE);
         DrawBox(i, world.map.mapwidth, BLUE);
         break;
       case '@':
-        DrawTileOutline(i, world.map.mapwidth, WHITE);
-        DrawPlayer(i, world.map.mapwidth, BLUE);
+        DrawTileOutline(i, world.map.mapwidth, RAYWHITE);
+        DrawPlayer(i, world.map.mapwidth, SKYBLUE);
+        break;
       default:
-        DrawTileOutline(i, world.map.mapwidth, WHITE);
+        DrawTileOutline(i, world.map.mapwidth, RAYWHITE);
       }
     }
+
+    char turnsBuffer [TURNBUFFER_LENGTH];
+    int cx = snprintf(turnsBuffer, TURNBUFFER_LENGTH, "Turns: %i", world.turns);
+    CHECK_F(cx >= 0 && cx < TURNBUFFER_LENGTH, "Something went wrong while writing the turnBuffer");
+    DrawText(turnsBuffer, 10, SCREENHEIGHT - 28, 18, RAYWHITE);
+
     EndDrawing();
     //----------------------------------------------------------------------------------
   }
